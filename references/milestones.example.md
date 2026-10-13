@@ -28,5 +28,5 @@ python3 scripts/tutor_progress.py milestone <领域> <概念> <掌握程度> [�
 ## 注意
 
 - **不要手改 `milestones.md`**：它是生成物，下次渲染会覆盖
-- 只记学习里程碑；课表、竞赛报名等非学习进度数据放 `local.md`
+- 只记学习里程碑；竞赛报名、日程等非学习数据放 `local.md` 或用户自己的文件
 - 早期版本写在 `progress.json` 里的里程碑（用 `lang` + `note` 字段）会被自动识别并渲染，无需迁移

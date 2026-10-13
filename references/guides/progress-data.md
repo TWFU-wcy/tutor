@@ -44,8 +44,8 @@
 | 字段 | 取值 | 说明 |
 | --- | --- | --- |
 | `mastery` | 未学过 / 初步了解 / 能独立使用 / 熟练掌握 | 掌握程度 |
-| `lastPracticed` | `YYYY-MM-DD` 或空 | 降级判断依据 |
-| `notes` | 字符串 | 错因、备注、降级标记 |
+| `lastPracticed` | `YYYY-MM-DD` 或空 | 最近一次练习日期（用于展示与排序） |
+| `notes` | 字符串 | 错因、备注 |
 
 **里程碑（`milestones` 数组）**：`{domain 或 lang, concept, level, date, note}`。
 领域名放在 `domain` 或旧版的 `lang` 都能识别；说明字段新旧版是 `note` / `notes`，两种都能读。
@@ -75,7 +75,7 @@
 - `references/milestones.md` 是**自动生成的人类可读视图**（脚本每次追加后重新渲染，也可用 `render` 手动重生成）
 - **不要手改 milestones.md**，改了下一次生成会被覆盖；要补记请用命令
 - 视图格式：`日期 · 知识点 → 掌握程度 · 说明`（按日期排序）
-- 只记学习里程碑，不要塞课表、竞赛报名等非学习进度数据——那些放 `local.md`
+- 只记学习里程碑，不要塞非学习数据（竞赛报名、日程等）——那些放 `local.md` 或用户自己的文件
 
 ## 进度查询展示格式（完整版）
 
@@ -122,6 +122,6 @@
 | --- | --- | --- |
 | `references/progress.json` | 学习进度权威源 | ❌ 本地数据 |
 | `references/milestones.md` | 里程碑自动生成视图 | ❌ 本地数据 |
-| `references/local.md` | 课表/校历路径、个人目标 | ❌ 本地数据 |
+| `references/local.md` | 学习目标、个人偏好 | ❌ 本地数据 |
 | `references/*.example.*` | 以上三者的模板 | ✅ |
 | `scripts/tutor_progress.py` | 读写 CLI | ✅ |

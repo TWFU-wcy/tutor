@@ -18,7 +18,7 @@ S=~/.agents/skills/tutor/scripts
 python3 $S/tutor_progress.py where   # 自检：技能路径、进度文件路径、目录是否可写
 ```
 
-环境变量 `TUTOR_PROGRESS` 可覆盖进度文件位置。首次使用建议 `cp references/local.example.md references/local.md`，填上课表和个人目标路径——教学和规划会先读它。
+环境变量 `TUTOR_PROGRESS` 可覆盖进度文件位置。首次使用建议 `cp references/local.example.md references/local.md`，填上学习目标——教学会先读它。
 
 ## 用法
 
@@ -62,7 +62,7 @@ references/
   progress.example.json         # 进度文件模板（progress.json 首次记录时自动生成）
   milestones.example.md         # 里程碑视图格式说明
   local.example.md              # 个人配置模板
-  guides/progress-schema.md     # 【开场必读】掌握程度等级、降级规则、读写流程
+  guides/progress-schema.md     # 【开场必读】掌握程度等级与读写流程
   guides/progress-data.md       # 【按需】数据结构、字段、别名、里程碑机制、展示格式
   guides/blockchain.md          # 区块链知识栈
   guides/database.md            # 数据库
