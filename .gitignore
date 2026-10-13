@@ -3,7 +3,6 @@ progress.json
 milestones.md
 local.md
 *.bak
-progress.json.lock
 .progress.*.tmp
 .DS_Store
 __pycache__/

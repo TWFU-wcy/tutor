@@ -20,7 +20,7 @@
       agent 的技能目录（~/.agents/skills、~/.claude/skills、DSH_HOME/skills…）。
       TUTOR_PROGRESS 可覆盖进度文件位置。
 """
-import json, sys, os, tempfile, contextlib
+import json, sys, os, tempfile
 
 # 进度文件定位：可用环境变量 TUTOR_PROGRESS 覆盖，默认取本脚本上一级的 references/progress.json
 PROG = os.environ.get("TUTOR_PROGRESS") or os.path.join(
@@ -65,43 +65,8 @@ def load():
         return dict(EMPTY)
 
 
-def _lock(fh):
-    """多 agent 同时写同一份进度时串行化；拿不到锁就照常写（不阻塞教学）。"""
-    try:
-        import fcntl
-        fcntl.flock(fh, fcntl.LOCK_EX)
-    except Exception:
-        pass
-
-
-@contextlib.contextmanager
-def locked():
-    """独占锁，用来包住整段「读 → 改 → 写」。
-
-    只锁写是不够的：两个 agent 若各自先读后写，后写的会覆盖先写的（丢更新）。
-    因此 update / add-note 必须在这个锁里重新 load 一次。
-    """
-    lf = None
-    try:
-        os.makedirs(os.path.dirname(PROG) or ".", exist_ok=True)
-        lf = open(PROG + ".lock", "a+")
-        _lock(lf)
-    except Exception:
-        if lf:
-            lf.close()
-        lf = None
-    try:
-        yield
-    finally:
-        if lf:
-            lf.close()
-
-
 def save(data):
-    """原子写：先写同目录临时文件再 os.replace，避免并发/中断写坏 JSON。
-
-    调用方负责持锁（见 locked()）；本函数自身不加锁，否则同进程重入会死锁。
-    """
+    """原子写：先写同目录临时文件再 os.replace，避免写一半被打断导致 JSON 损坏。"""
     d = os.path.dirname(PROG) or "."
     os.makedirs(d, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=d, prefix=".progress.", suffix=".tmp")
@@ -196,28 +161,26 @@ def cmd_update(domain, concept, field, value):
     if field not in ("mastery", "lastPracticed", "notes"):
         print(f"字段不支持: {field}（仅 mastery/lastPracticed/notes）", file=sys.stderr)
         sys.exit(1)
-    with locked():
-        data = load()
-        area = locate(data, domain)
-        if area is None:
-            area = data.setdefault(resolve_domain(data, domain), {"concepts": {}, "weakPoints": [], "exercises": []})
-            print(f"ℹ️ 新领域已初始化: {resolve_domain(data, domain)}")
-        c = area.setdefault("concepts", {}).setdefault(concept, {"mastery": "未学过", "lastPracticed": "", "notes": ""})
-        c[field] = value
-        save(data)
+    data = load()
+    area = locate(data, domain)
+    if area is None:
+        area = data.setdefault(resolve_domain(data, domain), {"concepts": {}, "weakPoints": [], "exercises": []})
+        print(f"ℹ️ 新领域已初始化: {resolve_domain(data, domain)}")
+    c = area.setdefault("concepts", {}).setdefault(concept, {"mastery": "未学过", "lastPracticed": "", "notes": ""})
+    c[field] = value
+    save(data)
     print(f"✓ 已更新 {domain}/{concept}.{field} = {value}")
 
 
 def cmd_add_note(domain, concept, note):
-    with locked():
-        data = load()
-        area = locate(data, domain)
-        if area is None:
-            area = data.setdefault(resolve_domain(data, domain), {"concepts": {}, "weakPoints": [], "exercises": []})
-            print(f"ℹ️ 新领域已初始化: {resolve_domain(data, domain)}")
-        c = area.setdefault("concepts", {}).setdefault(concept, {"mastery": "未学过", "lastPracticed": "", "notes": ""})
-        c["notes"] = note
-        save(data)
+    data = load()
+    area = locate(data, domain)
+    if area is None:
+        area = data.setdefault(resolve_domain(data, domain), {"concepts": {}, "weakPoints": [], "exercises": []})
+        print(f"ℹ️ 新领域已初始化: {resolve_domain(data, domain)}")
+    c = area.setdefault("concepts", {}).setdefault(concept, {"mastery": "未学过", "lastPracticed": "", "notes": ""})
+    c["notes"] = note
+    save(data)
     print(f"✓ 已写备注 {domain}/{concept}")
 
 
