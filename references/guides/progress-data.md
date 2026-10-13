@@ -125,4 +125,3 @@
 | `references/local.md` | 课表/校历路径、个人目标 | ❌ 本地数据 |
 | `references/*.example.*` | 以上三者的模板 | ✅ |
 | `scripts/tutor_progress.py` | 读写 CLI | ✅ |
-| `scripts/selftest.py` | 自检（53 项断言） | ✅ |

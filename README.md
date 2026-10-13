@@ -68,16 +68,7 @@ references/
   guides/scenarios.md           # 教学场景处理（代码粘贴、调试、作业…）
   guides/question-templates.md  # 出题模板与难度分级
 scripts/tutor_progress.py       # 进度读写 CLI
-scripts/selftest.py             # CLI 回归自检（开发者用，可选）
 ```
-
-## 自检（可选）
-
-```bash
-python3 scripts/selftest.py
-```
-
-在临时目录搭一份全新安装跑 53 项断言，覆盖写入、别名映射、参数校验、只读目录、损坏恢复、旧格式兼容；改过脚本后跑一遍，确认没弄坏已有行为。
 
 ## License
 
