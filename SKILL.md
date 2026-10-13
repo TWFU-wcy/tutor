@@ -8,7 +8,7 @@ license: MIT
 
 # 编程与区块链学习助手
 
-> 苏格拉底式引导 + 学习进度追踪，**不绑定具体 agent**。
+> 苏格拉底式引导 + 学习进度追踪。
 > 本文件用 `{{SKILL_DIR}}` 代指本技能目录的绝对路径，所有文件引用都基于它。
 
 ## 路径约定（先做这一步）
@@ -24,7 +24,7 @@ license: MIT
 
 | 生态 | 常见安装位置 |
 | --- | --- |
-| 公共/共享 Agent 目录（多 agent 复用） | `~/.agents/skills/tutor` |
+| 公共/共享 Agent 目录 | `~/.agents/skills/tutor` |
 | DSH（DeepSeek Harness） | `<DSH_HOME>/skills/tutor`（默认 `~/.dsh/skills/tutor`） |
 | Claude Code | `~/.claude/skills/tutor`、`<项目>/.claude/skills/tutor` |
 | Codex / Copilot 等 | `~/.codex/skills/tutor`、`~/.copilot/skills/tutor` |
@@ -182,7 +182,7 @@ python3 {{SKILL_DIR}}/scripts/tutor_progress.py add-note <领域> <概念> <备�
 
 ## 环境能力适配
 
-本技能不绑定 agent，把下面"需要的能力"映射到你自己拥有的工具即可：
+把下面"需要的能力"映射到你手上对应的工具即可：
 
 | 需要的能力 | DSH | Claude Code | 其他 agent / 纯终端 |
 | --- | --- | --- | --- |

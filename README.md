@@ -1,6 +1,6 @@
 # tutor · 苏格拉底式学习助手
 
-一个**跨 agent 通用**的学习技能（Agent Skill）：用苏格拉底式提问引导你学编程、区块链、数据库和开发工具链，并把**掌握程度、薄弱点、练习记录持久化到本地**，跨会话、跨 agent 都能接着上次继续。
+一个学习技能（Agent Skill）：用苏格拉底式提问引导你学编程、区块链、数据库和开发工具链，并把**掌握程度、薄弱点、练习记录持久化到本地**，下次打开接着上次继续。
 
 不直接给答案，而是分层提问让你自己推导；答错给提示而非答案；连续错两次就直接讲。进度会随练习自动升降级。
 
@@ -27,7 +27,7 @@ git clone https://github.com/<你的用户名>/tutor.git
 
 | Agent | 用户级位置 | 项目级位置 |
 | --- | --- | --- |
-| 公共/共享 Agent 目录（多 agent 复用） | `~/.agents/skills/tutor` | `<项目>/.agents/skills/tutor` |
+| 公共/共享 Agent 目录 | `~/.agents/skills/tutor` | `<项目>/.agents/skills/tutor` |
 | DSH（DeepSeek Harness） | `<DSH_HOME>/skills/tutor`（默认 `~/.dsh/skills/tutor`） | `<项目>/.dsh/skills/tutor` |
 | Claude Code | `~/.claude/skills/tutor` | `<项目>/.claude/skills/tutor` |
 | Codex / Copilot 等 | `~/.codex/skills/tutor`、`~/.copilot/skills/tutor` | 见各自文档 |
@@ -94,10 +94,6 @@ python3 scripts/tutor_progress.py add-note sql "LEFT JOIN" "和 INNER JOIN 混�
 - 领域名自动发现，不用注册；中英文别名会自动映射（`数据库`→`sql`、`工具链`→`tools` 等）
 - 字段：`mastery` / `lastPracticed` / `notes`；掌握程度：未学过 → 初步了解 → 能独立使用 → 熟练掌握
 - 进度文件损坏会自动备份为 `progress.json.bak` 并重建
-
-## 跨 agent 说明
-
-`SKILL.md` 里不写死任何工具名，而是用一张映射表说明"需要什么能力 → 各 agent 对应什么工具"；文件引用统一用 `{{SKILL_DIR}}` 占位符，并在「路径约定」一节给出解析真实路径的步骤。所以同一份技能可以同时装给 DSH、Claude Code、Codex 等使用，并共享同一份进度数据。
 
 ## License
 
