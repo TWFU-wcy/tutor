@@ -29,6 +29,8 @@ license: MIT
 | Codex / Copilot 等 | `~/.codex/skills/tutor`、`~/.copilot/skills/tutor` |
 | 项目级 | `<项目>/.dsh/skills/tutor`、`<项目>/.agents/skills/tutor` |
 
+**Python 命令名**：本文命令统一写 `python3`。Windows 上换成 `python`（或 `py -3`），macOS / Linux 用 `python3`。
+
 > 解析一次后记住它，后续把 `{{SKILL_DIR}}` 换成真实路径即可，例如：
 > `python3 /Users/you/.agents/skills/tutor/scripts/tutor_progress.py list`
 
@@ -120,6 +122,8 @@ license: MIT
 ## 进度追踪
 
 **权威源：** `{{SKILL_DIR}}/references/progress.json`（不要用文件读取工具全文加载，约 35KB；用下面的脚本精准读写）
+
+> Windows 上把下面每行的 `python3` 换成 `python`。
 
 ```bash
 python3 {{SKILL_DIR}}/scripts/tutor_progress.py where            # 自检：报告路径与是否可写

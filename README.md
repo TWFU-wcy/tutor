@@ -31,6 +31,8 @@ python3 $S/tutor_progress.py where   # 自检：技能路径、进度文件路�
 
 ## 进度脚本
 
+Windows 上把命令里的 `python3` 换成 `python`（或 `py -3`）。
+
 ```bash
 S=~/.agents/skills/tutor/scripts/tutor_progress.py
 
