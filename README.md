@@ -11,7 +11,7 @@
 技能就是一个目录，放进 agent 会扫描技能的位置即可（各 agent 的技能目录见其文档）：
 
 ```bash
-git clone <仓库地址> tutor
+git clone https://github.com/TWFU-wcy/tutor.git
 mkdir -p ~/.agents/skills && mv tutor ~/.agents/skills/tutor
 
 S=~/.agents/skills/tutor/scripts
