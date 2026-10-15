@@ -15,7 +15,7 @@
         "v-for 列表渲染": {"mastery": "能独立使用", "lastPracticed": "2026-04-30", "notes": "需注意 :key"}
       },
       "weakPoints": ["ref 与 reactive 的区别"],
-      "exercises": [{"name": "随堂练习：v-for 渲染表格", "date": "2026-04-30", "result": "通过"}]
+      "exercises": [{"name": "随堂练习：v-for 渲染表格", "date": "2026-04-30", "result": "通过", "domain": "vue", "notes": ""}]
     }
   },
   "sql": {
@@ -37,7 +37,7 @@
 | --- | --- | --- |
 | `concepts` | 对象 | 知识点 → `{mastery, lastPracticed, notes}` |
 | `weakPoints` | 数组 | 薄弱点，出题时优先覆盖 |
-| `exercises` | 数组 | 练习记录，`{name, date, result}`，`result` 为 `通过` / `未通过` |
+| `exercises` | 数组 | 练习记录，权威 schema 为 `{name, date, result, domain, notes}`；`result` 只能是 `通过` / `未通过`（脚本会校验，非法值直接报错拒绝写入），`domain` 取当前领域 |
 
 **保留键**：`languages`、`milestones`、`concepts`、`weakPoints`、`exercises`、`_comment`、版本号字段
 是进度结构本身，**不能当领域名**。写命令用到这些名字会报错并退出，不会改动进度文件。
@@ -76,6 +76,7 @@
 
 - **权威源是 `progress.json` 的 `milestones` 数组**，用 `milestone` 命令追加
 - `references/milestones.md` 是**自动生成的人类可读视图**（脚本每次追加后重新渲染，也可用 `render` 手动重生成）
+- 视图默认与进度文件同目录；设置 `TUTOR_MILESTONES` 可另行指定（测试时配合 `TUTOR_PROGRESS` 使用，避免写到真实数据）
 - **不要手改 milestones.md**，改了下一次生成会被覆盖；要补记请用命令
 - 视图格式：`日期 · 知识点 → 掌握程度 · 说明`（按日期排序）
 - 只记学习里程碑，不要塞非学习数据（竞赛报名、日程等）——那些放 `local.md` 或用户自己的文件
@@ -118,6 +119,8 @@
 | 文件内容损坏 | 备份为 `progress.json.bak`，重建空结构并提示 |
 | 目录只读 | 读取正常；写入被拒并提示放开目录权限 |
 | 概念名写错 | 自动提示相似概念；`update` 会新建并在 stderr 警告 |
+| 领域名是保留键 | 报错并退出，进度文件不被改动 |
+| `exercise` 的 result 不是 `通过` / `未通过` | 报错并退出（可写入说明性文字的位置是 `notes`） |
 
 ## 相关文件
 

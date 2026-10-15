@@ -19,7 +19,8 @@
   tutor_progress.py render                                  由 progress.json 重新生成 milestones.md 视图
 
 环境变量
-  TUTOR_PROGRESS   覆盖进度文件路径（默认 <技能目录>/references/progress.json）
+  TUTOR_PROGRESS    覆盖进度文件路径（默认 <技能目录>/references/progress.json）
+  TUTOR_MILESTONES  覆盖里程碑视图路径（默认与进度文件同目录下的 milestones.md）
 
 领域名自动发现，并支持别名（数据库/database→sql、工具链/git→tools、智能合约→smart-contract …）。
 保留键（languages / milestones / concepts / weakPoints / exercises / _comment / 版本号字段）不能当领域名，
@@ -39,11 +40,15 @@ SKILL_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file_
 REFS = os.path.join(SKILL_DIR, "references")
 PROG = os.path.abspath(os.environ.get("TUTOR_PROGRESS") or os.path.join(REFS, "progress.json"))
 EXAMPLE = os.path.join(REFS, "progress.example.json")
-MILESTONES_MD = os.path.join(REFS, "milestones.md")
+# 里程碑视图默认跟着进度文件走：默认布局下仍是 references/milestones.md，
+# 用 TUTOR_PROGRESS 指向别处时（例如测试用临时目录）不会误写真实数据。
+MILESTONES_MD = os.path.abspath(
+    os.environ.get("TUTOR_MILESTONES")
+    or os.path.join(os.path.dirname(PROG), "milestones.md")
+)
 
 MASTERY = ("未学过", "初步了解", "能独立使用", "熟练掌握")
 RESULTS = ("通过", "未通过")
-
 
 # 进度文件的保留键：这些名字是结构本身（顶层容器、领域内字段、说明与版本号），
 # 一旦被当成领域名写入，会把已有数据整体替换掉（例如 milestones 数组被换成领域字典）。
@@ -353,11 +358,57 @@ def cmd_weak(data, domain, action, point):
     print(f"✓ 已{'记入' if adding else '移除'} {real_domain} 薄弱点: {point}（共 {len(weak)} 条）")
 
 
+def parse_exercise_args(args):
+    """解析 exercise 的位置参数，返回 (领域, 名称, 结果, 备注)。
+
+    规则（不依赖「第一个等于 通过/未通过 的参数」，所以概念名本身叫「通过」也能用）：
+      1. 结果优先取固定位置的 args[2]（<领域> <名称> <结果> [备注]）；
+      2. args[2] 不是合法结果时，回退到「从 args[2] 起第一个合法结果」这个旧用法，
+         以便不加引号的多词名称（exercise sql 写 JOIN 查询 未通过）继续可用；
+      3. 也可以用 --result/-r 显式指定结果，此时结果前的都是名称、后面都是备注。
+    """
+    flag = next((i for i, a in enumerate(args) if a in ("--result", "-r")), None)
+    if flag is not None:
+        if flag + 1 >= len(args):
+            die("❌ --result 后面要跟 通过 或 未通过\n"
+                "  用法: tutor_progress.py exercise <领域> <名称> --result <通过|未通过> [备注]")
+        result = args[flag + 1]
+        name = " ".join(args[1:flag]).strip()
+        note = " ".join(args[flag + 2:])
+    else:
+        result = args[2]
+        if result in RESULTS:
+            name, note = args[1], " ".join(args[3:])
+        else:
+            hit = next((i for i, a in enumerate(args[2:], start=2) if a in RESULTS), None)
+            if hit is None:
+                name, note = args[1], " ".join(args[3:])
+            else:
+                result = args[hit]
+                name, note = " ".join(args[1:hit]).strip(), " ".join(args[hit + 1:])
+    if result not in RESULTS:
+        die(f"❌ 练习结果必须是 {' / '.join(RESULTS)}（收到「{result}」）\n"
+            f"  用法: tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]\n"
+            f"  名称含空格时请加引号，或用 --result 显式指定结果。")
+    if not name:
+        die("❌ 缺少练习名称\n"
+            "  用法: tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]")
+    return args[0], name, result, note
+
+
 def cmd_exercise(data, domain, name, result, note=""):
+    """练习记录 schema（权威定义）：{name, date, result, domain, notes}
+
+    result 只能是 通过 / 未通过（调用前已校验）；domain 取当前领域（含别名解析结果）。
+    """
     area, real_domain = area_of(data, domain)
-    record = {"name": name, "date": datetime.date.today().isoformat(), "result": result}
-    if note:
-        record["notes"] = note
+    record = {
+        "name": name,
+        "date": datetime.date.today().isoformat(),
+        "result": result,
+        "domain": real_domain,
+        "notes": note,
+    }
     area.setdefault("exercises", []).append(record)
     save(data)
     print(f"✓ 已记录练习 {real_domain}/{name} → {result}")
@@ -419,12 +470,9 @@ def main(argv):
 
     if cmd == "exercise":
         need(args, 3, "exercise <领域> <名称> <通过|未通过> [备注]")
-        hit = next((i for i, a in enumerate(args) if a in RESULTS), None)
-        if hit is None or hit == 1:
-            die(f"结果必须是: {' / '.join(RESULTS)}\n"
-                f"  用法: tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]")
+        domain, name, result, note = parse_exercise_args(args)
         data, _ = load()
-        cmd_exercise(data, args[0], " ".join(args[1:hit]), args[hit], " ".join(args[hit + 1:]))
+        cmd_exercise(data, domain, name, result, note)
         return 0
 
     if cmd == "milestone":

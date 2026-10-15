@@ -81,4 +81,5 @@
 2. 选择难度等级和题型（优先出用户薄弱环节的题）
 3. 出题后等用户作答
 4. 批改 + 引导式讲解（不是只说对错，要解释为什么）
-5. 更新 progress.json 中的 exercises 记录（标注 domain 字段）
+5. 更新进度：`tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]`
+   - 记录 shape 为 `{name, date, result, domain, notes}`，`domain` 由脚本自动填当前领域，`result` 只能是 `通过` / `未通过`（错因、说明写进 `notes`，不要塞进 `result`）
