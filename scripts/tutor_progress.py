@@ -39,9 +39,13 @@ PROG = os.path.abspath(os.environ.get("TUTOR_PROGRESS") or os.path.join(REFS, "p
 EXAMPLE = os.path.join(REFS, "progress.example.json")
 MILESTONES_MD = os.path.join(REFS, "milestones.md")
 
-EMPTY = {"languages": {}, "milestones": []}
 MASTERY = ("未学过", "初步了解", "能独立使用", "熟练掌握")
 RESULTS = ("通过", "未通过")
+
+
+def empty_data():
+    """全新的空进度结构（就是真实 schema，不读取任何模板/示例文件）。"""
+    return {"languages": {}, "milestones": []}
 
 DOMAIN_ALIASES = {
     "database": "sql", "db": "sql", "mysql": "sql", "sqlite": "sql",
@@ -120,20 +124,21 @@ def match_concept(concepts, name):
 
 # ── 读写 ──────────────────────────────────────────────────────────────────────
 def load():
-    """读进度。只读命令不落盘；文件缺失时返回空骨架。返回 (data, 文件是否存在)。"""
+    """读进度。只读命令不落盘；文件缺失时返回全新的空结构。返回 (data, 文件是否存在)。
+
+    注意：**不读 references/progress.example.json**。示例文件只是 schema 文档，
+    把它当成初始数据会让全新安装凭空出现「python: 1 个概念」这类假进度，
+    并会在首次写入时把示例固化进真实进度文件。
+    """
     if not os.path.exists(PROG):
-        if os.path.exists(EXAMPLE):
-            try:
-                with open(EXAMPLE, encoding="utf-8") as f:
-                    data = json.load(f)
-                data.pop("_comment", None)
-                return data, False
-            except (OSError, ValueError):
-                pass
-        return dict(EMPTY), False
+        return empty_data(), False
     try:
         with open(PROG, encoding="utf-8") as f:
-            return json.load(f), True
+            data = json.load(f)
+        if not isinstance(data, dict):
+            raise ValueError("顶层结构不是 JSON 对象")
+        data.pop("_comment", None)
+        return data, True
     except ValueError as e:
         bak = PROG + ".bak"
         try:
@@ -141,7 +146,7 @@ def load():
             print(f"⚠️ 进度文件损坏（{e}），已备份为 {bak}，将重建", file=sys.stderr)
         except OSError:
             print(f"⚠️ 进度文件损坏（{e}），且无法备份，请检查权限", file=sys.stderr)
-        return dict(EMPTY), False
+        return empty_data(), False
 
 
 def save(data):

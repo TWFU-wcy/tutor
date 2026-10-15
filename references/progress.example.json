@@ -1,39 +1,5 @@
 {
-  "_comment": "这是模板文件。真正的进度文件 progress.json 不会被提交（见 .gitignore）。脚本发现 progress.json 不存在时会以本文件为模板自动生成一个。",
-  "languages": {
-    "python": {
-      "concepts": {
-        "变量与数据类型": {
-          "mastery": "初步了解",
-          "lastPracticed": "",
-          "notes": ""
-        }
-      },
-      "weakPoints": [],
-      "exercises": []
-    }
-  },
-  "sql": {
-    "concepts": {
-      "SQL 基础查询": {
-        "mastery": "未学过",
-        "lastPracticed": "",
-        "notes": ""
-      }
-    },
-    "weakPoints": [],
-    "exercises": []
-  },
-  "blockchain": {
-    "concepts": {
-      "哈希函数": {
-        "mastery": "未学过",
-        "lastPracticed": "",
-        "notes": ""
-      }
-    },
-    "weakPoints": [],
-    "exercises": []
-  },
+  "_comment": "schema 示例（空骨架），不是初始数据。真正的 progress.json 不进版本控制（见 .gitignore）；脚本发现它不存在时会直接构造这个空结构，绝不读取本文件。填充后的形状见 references/guides/progress-data.md。",
+  "languages": {},
   "milestones": []
 }
