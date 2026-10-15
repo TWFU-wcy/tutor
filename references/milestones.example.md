@@ -5,8 +5,10 @@
 ## 生成方式
 
 ```bash
-python3 scripts/tutor_progress.py milestone <领域> <概念> <掌握程度> [备注]
+python3 {{SKILL_DIR}}/scripts/tutor_progress.py milestone <领域> <概念> <掌握程度> [备注]
 ```
+
+`{{SKILL_DIR}}` 是**技能目录的绝对路径**（相对路径会找不到文件，详见 `SKILL.md` 的「路径约定」）。
 
 命令会把条目追加进 `references/progress.json` 的 `milestones` 数组（权威源），然后重新渲染 `references/milestones.md`。也可以用 `render` 命令单独重生成视图。
 

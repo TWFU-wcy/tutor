@@ -77,9 +77,9 @@
 
 ## 出题流程
 
-1. 用 `tutor_progress.py list` + `get <领域>` 读取进度，确定用户当前水平（跨领域汇总；该文件约 16K token，不要全文 read）
+1. 用 `python3 {{SKILL_DIR}}/scripts/tutor_progress.py list` + `get <领域>` 读取进度，确定用户当前水平（跨领域汇总；进度文件 `{{SKILL_DIR}}/references/progress.json` 实测 34029 字节 / 约 34 KB，不要用文件读取工具全文 read）
 2. 选择难度等级和题型（优先出用户薄弱环节的题）
 3. 出题后等用户作答
 4. 批改 + 引导式讲解（不是只说对错，要解释为什么）
-5. 更新进度：`tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]`
+5. 更新进度：`python3 {{SKILL_DIR}}/scripts/tutor_progress.py exercise <领域> <名称> <通过|未通过> [备注]`
    - 记录 shape 为 `{name, date, result, domain, notes}`，`domain` 由脚本自动填当前领域，`result` 只能是 `通过` / `未通过`（错因、说明写进 `notes`，不要塞进 `result`）

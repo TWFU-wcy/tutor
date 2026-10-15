@@ -14,7 +14,7 @@ license: MIT
 
 ## 路径约定（先做这一步）
 
-本文件用 `{{SKILL_DIR}}` 代指**本技能目录的绝对路径**。会话工作目录通常不是技能目录，相对路径会找不到文件，所以所有文件引用都写成 `{{SKILL_DIR}}/...`。
+本文件用 `{{SKILL_DIR}}` 代指**本技能目录的绝对路径**。会话工作目录通常不是技能目录，相对路径会找不到文件，所以所有文件引用都写成 `{{SKILL_DIR}}/...`；`README.md` 用 shell 变量 `SKILL_DIR` 表示同一个东西，`references/` 下的文档同样遵循这条约定——脚本命令里的脚本路径也要写全，不要写 `scripts/tutor_progress.py` 这种相对路径。
 
 **解析真实路径**——按顺序尝试，命中即停：
 
@@ -123,7 +123,7 @@ license: MIT
 
 ## 进度追踪
 
-**权威源：** `{{SKILL_DIR}}/references/progress.json`（不要用文件读取工具全文加载，约 35KB；用下面的脚本精准读写）
+**权威源：** `{{SKILL_DIR}}/references/progress.json`（不要用文件读取工具全文加载，实测 34029 字节 / 约 34 KB；用下面的脚本精准读写）
 
 > Windows 上把下面每行的 `python3` 换成 `python`。
 
@@ -140,7 +140,9 @@ python3 {{SKILL_DIR}}/scripts/tutor_progress.py milestone <领域> <概念> <掌
 
 - 领域名**自动发现**，无需注册；中英文别名自动映射（`数据库`/`database`→`sql`、`工具链`/`git`→`tools`、`智能合约`→`smart-contract`、`容器`→`container`、`后端`→`backend`）。不确定先跑 `list`。
 - 新领域、新概念在首次写入时自动创建；概念名写错会提示相似项。
-- 进度文件不存在时脚本自动初始化；文件损坏会自动备份为 `.bak` 并重建。
+- 进度文件不存在时脚本按**空结构**初始化（`{"languages": {}, "milestones": []}`，不会拿示例数据充数）；文件损坏会自动备份为 `.bak` 并重建。
+- `milestones`、`languages`、`concepts`、`weakPoints`、`exercises` 等**保留键不能当领域名**，写命令遇到会报错退出，不会改动进度文件。
+- `exercise` 的 `result` 只接受 `通过` / `未通过`，说明性文字写进备注；名称含空格要加引号。
 
 **强制写入时机（必须先调工具，不得只输出文字说"已记录"）：**
 
