@@ -2,7 +2,7 @@
 """tutor_progress.py — 学习进度精准读写 CLI（纯标准库，零依赖，可整体拷贝到任意技能目录）
 
 设计目标
-  * 省 token：只读写需要的片段，不把整个 progress.json（~35KB）塞进上下文
+  * 省 token：只读写需要的片段，不把整个 progress.json（实测 34029 字节 / 约 34 KB）塞进上下文
   * 可移植：用 __file__ 定位自身，可整体拷进任意 agent 的技能目录
   * 写入安全：临时文件 + 原子替换，写一半被打断也不会损坏数据
   * 不破坏历史数据：兼容早期字段形状（lang/domain、note/notes、字段不全的 exercises）
