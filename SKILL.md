@@ -1,7 +1,7 @@
 ---
 name: tutor
 description: 面向计算机大类学生的苏格拉底式学习助手（保留学习进度）。学编程/区块链/数据库/工具链时加载——用户说"学 XX""教教我 XX""出题""我的进度"时触发。
-version: 1.0.0
+version: 1.1.0
 author: 吞甫
 license: MIT
 ---
