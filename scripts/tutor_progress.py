@@ -22,6 +22,8 @@
   TUTOR_PROGRESS   覆盖进度文件路径（默认 <技能目录>/references/progress.json）
 
 领域名自动发现，并支持别名（数据库/database→sql、工具链/git→tools、智能合约→smart-contract …）。
+保留键（languages / milestones / concepts / weakPoints / exercises / _comment / 版本号字段）不能当领域名，
+写命令遇到保留键会直接报错退出，不会改动进度文件。
 """
 import datetime
 import difflib
@@ -41,6 +43,15 @@ MILESTONES_MD = os.path.join(REFS, "milestones.md")
 
 MASTERY = ("未学过", "初步了解", "能独立使用", "熟练掌握")
 RESULTS = ("通过", "未通过")
+
+
+# 进度文件的保留键：这些名字是结构本身（顶层容器、领域内字段、说明与版本号），
+# 一旦被当成领域名写入，会把已有数据整体替换掉（例如 milestones 数组被换成领域字典）。
+RESERVED_KEYS = (
+    "languages", "milestones", "concepts", "weakPoints", "exercises",
+    "_comment", "version", "schemaVersion", "schema_version",
+)
+RESERVED_LOWER = frozenset(k.lower() for k in RESERVED_KEYS)
 
 
 def empty_data():
@@ -68,6 +79,27 @@ def need(args, n, form):
         die(f"❌ 参数不足\n  用法: tutor_progress.py {form}")
 
 
+def is_reserved(name):
+    """该名字是否是进度文件的结构保留键（不能当领域名）。"""
+    key = str(name).strip()
+    return key in RESERVED_KEYS or key.lower() in RESERVED_LOWER
+
+
+def reserved_msg(domain, writing=True):
+    msg = (f"❌ 「{domain}」是进度文件的保留键，不能当领域名。\n"
+           f"  保留键: {', '.join(RESERVED_KEYS)}\n"
+           f"  这些名字是进度结构的容器/字段，写成领域名会覆盖已有数据。\n"
+           f"  请换一个领域名（例如 python、sql、blockchain）。")
+    if writing:
+        msg += "\n  进度文件未被改动。"
+    return msg
+
+
+def reject_reserved(domain, writing=True):
+    if is_reserved(domain):
+        die(reserved_msg(domain, writing))
+
+
 # ── 领域与概念解析 ────────────────────────────────────────────────────────────
 def resolve_domain(data, domain):
     """别名 → 规范领域名。
@@ -91,7 +123,7 @@ def all_areas(data):
     """自动发现领域：languages 下的语言 + 所有形如 {concepts:…} 的顶层键。"""
     areas = list(data.get("languages", {}).keys())
     for dom, val in data.items():
-        if dom in ("languages", "milestones") or dom in areas:
+        if dom in areas or is_reserved(dom):
             continue
         if isinstance(val, dict) and "concepts" in val:
             areas.append(dom)
@@ -99,8 +131,13 @@ def all_areas(data):
 
 
 def area_of(data, domain):
-    """取领域字典，不存在则建骨架（供写命令使用）。返回 (领域字典, 规范领域名)。"""
+    """取领域字典，不存在则建骨架（供写命令使用）。返回 (领域字典, 规范领域名)。
+
+    保留键直接报错退出——在建立骨架前就拦住，保证进度文件不被改动。
+    """
+    reject_reserved(domain)
     name = resolve_domain(data, domain)
+    reject_reserved(name)
     if name in data.get("languages", {}):
         return data["languages"][name], name
     if isinstance(data.get(name), dict) and "concepts" in data[name]:
@@ -237,6 +274,7 @@ def cmd_list(data, exists):
 
 
 def cmd_get(data, domain, concept=None):
+    reject_reserved(domain, writing=False)
     area = locate(data, domain)
     if area is None:
         die(f"未找到领域: {domain}\n  现有领域: {', '.join(all_areas(data)) or '（无）'}")
@@ -328,6 +366,7 @@ def cmd_exercise(data, domain, name, result, note=""):
 def cmd_milestone(data, domain, concept, level, note=""):
     if level not in MASTERY:
         die(f"掌握程度取值必须是: {' / '.join(MASTERY)}")
+    reject_reserved(domain)
     entry = {"domain": resolve_domain(data, domain), "concept": concept,
              "level": level, "date": datetime.date.today().isoformat()}
     if note:

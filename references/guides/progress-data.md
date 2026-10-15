@@ -39,6 +39,9 @@
 | `weakPoints` | 数组 | 薄弱点，出题时优先覆盖 |
 | `exercises` | 数组 | 练习记录，`{name, date, result}`，`result` 为 `通过` / `未通过` |
 
+**保留键**：`languages`、`milestones`、`concepts`、`weakPoints`、`exercises`、`_comment`、版本号字段
+是进度结构本身，**不能当领域名**。写命令用到这些名字会报错并退出，不会改动进度文件。
+
 **概念（concept）**：
 
 | 字段 | 取值 | 说明 |
